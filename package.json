@@ -1,0 +1,28 @@
+{
+  "name": "oauth2",
+  "version": "0.1.0",
+  "description": "OAuth2 for Kibana",
+  "scripts": {
+    "build": "gulp build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/trevan/oauth2.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "bell": "5.4.0",
+    "boom": "2.8.0",
+    "hapi": "8.8.1",
+    "hapi-auth-cookie": "3.1.0",
+    "joi": "6.6.1",
+    "lodash": "3.10.1"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-rename": "^1.2.2",
+    "gulp-zip": "^3.2.0",
+    "path": "^0.12.7",
+    "vinyl-fs": "^2.3.4"
+  }
+}
