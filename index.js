@@ -2,6 +2,8 @@ const hapiAuthCookie = require('hapi-auth-cookie');
 const Boom = require('boom');
 const Bell = require('bell');
 
+const esRequestInterceptor = require('./server/es_request_interceptor');
+
 module.exports = function (kibana) {
   return new kibana.Plugin({
     require: ['kibana', 'elasticsearch'],
@@ -15,6 +17,7 @@ module.exports = function (kibana) {
         provider: Joi.string(),
         providerId: Joi.string(),
         providerSecret: Joi.string(),
+        allowedIndices: Joi.array().items(Joi.string()).single()
       }).default()
     },
 
@@ -76,6 +79,8 @@ module.exports = function (kibana) {
           reply.redirect('./');
         }
       });
+
+      esRequestInterceptor(server);
     }
   });
 };
