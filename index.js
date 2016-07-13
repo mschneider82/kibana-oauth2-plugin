@@ -12,11 +12,11 @@ module.exports = function (kibana) {
       return Joi.object({
         enabled: Joi.boolean().default(true),
         cookieName: Joi.string().default('sid'),
-        encryptionKey: Joi.string(),
+        password: Joi.string(),
         sessionTimeout: Joi.number().default(30 * 60 * 1000),
         provider: Joi.string(),
-        providerId: Joi.string(),
-        providerSecret: Joi.string(),
+        clientId: Joi.string(),
+        clientSecret: Joi.string(),
         allowedIndices: Joi.array().items(Joi.string()).single()
       }).default()
     },
@@ -27,9 +27,9 @@ module.exports = function (kibana) {
 
     init: function (server, options) {
       const config = server.config();
-      if (config.get('oauth2.encryptionKey') == null) throw new Error('oauth2.encryptionKey is required in kibana.yml.');
-      if (config.get('oauth2.provider') == null || config.get('oauth2.providerId') == null || config.get('oauth2.providerSecret') == null) {
-        throw new Error('Please set oauth2.provider, oauth2.providerId, and oauth2.providerSecret in kibana.yml.');
+      if (config.get('oauth2.password') == null) throw new Error('oauth2.password is required in kibana.yml.');
+      if (config.get('oauth2.provider') == null || config.get('oauth2.clientId') == null || config.get('oauth2.clientSecret') == null) {
+        throw new Error('Please set oauth2.provider, oauth2.clientId, and oauth2.clientSecret in kibana.yml.');
       }
       if (config.get('server.ssl.key') == null || config.get('server.ssl.cert') == null) {
         throw new Error('HTTPS is required. Please set server.ssl.key and server.ssl.cert in kibana.yml.');
@@ -38,7 +38,7 @@ module.exports = function (kibana) {
       server.register([hapiAuthCookie, Bell], function (error) {
         server.auth.strategy('session', 'cookie', 'required', {
             cookie: config.get('oauth2.cookieName'),
-            password: config.get('oauth2.encryptionKey'),
+            password: config.get('oauth2.password'),
             ttl: config.get('oauth2.sessionTimeout'),
             path: config.get('server.basePath') + '/',
             clearInvalid: true,
@@ -48,9 +48,9 @@ module.exports = function (kibana) {
 
         server.auth.strategy(config.get('oauth2.provider'), 'bell', {
           provider: config.get('oauth2.provider'),
-          password: config.get('oauth2.encryptionKey'),
-          clientId: config.get('oauth2.providerId'),
-          clientSecret: config.get('oauth2.providerSecret')
+          password: config.get('oauth2.password'),
+          clientId: config.get('oauth2.clientId'),
+          clientSecret: config.get('oauth2.clientSecret')
         });
       });
 

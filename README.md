@@ -14,12 +14,12 @@ bin/kibana plugin -i oauth2 -u https://github.com/trevan/oauth2/releases/downloa
 
 3. SSL is required so set the `server.ssl.key` and `server.ssl.cert` config options.
 
-4. Set the following config options:
+4. Set the following config options that map to [Bell `server.auth.strategy` options](https://github.com/hapijs/bell/blob/master/API.md):
 ```
-oauth2.encryptionKey
+oauth2.password
 oauth2.provider
-oauth2.providerId
-oauth2.providerSecret
+oauth2.clientId
+oauth2.clientSecret
 ```
 
 To get the list of supported providers, see [Bell's documentation](https://github.com/hapijs/bell)
