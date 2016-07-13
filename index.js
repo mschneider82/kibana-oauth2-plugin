@@ -46,8 +46,8 @@ module.exports = function (kibana) {
             redirectTo: `${config.get('server.basePath')}/login`
         });
 
-        server.auth.strategy('github', 'bell', {
-          provider: 'github',
+        server.auth.strategy(config.get('oauth2.provider'), 'bell', {
+          provider: config.get('oauth2.provider'),
           password: config.get('oauth2.encryptionKey'),
           clientId: config.get('oauth2.providerId'),
           clientSecret: config.get('oauth2.providerSecret')
@@ -58,7 +58,7 @@ module.exports = function (kibana) {
         method: ['GET', 'POST'],
         path: '/login',
         config: {
-          auth: 'github'
+          auth: config.get('oauth2.provider')
         },
         handler: function (request, reply) {
           if (!request.auth.isAuthenticated) {
