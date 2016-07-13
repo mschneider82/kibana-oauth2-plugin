@@ -31,9 +31,6 @@ module.exports = function (kibana) {
       if (config.get('oauth2.provider') == null || config.get('oauth2.providerId') == null || config.get('oauth2.providerSecret') == null) {
         throw new Error('Please set oauth2.provider, oauth2.providerId, and oauth2.providerSecret in kibana.yml.');
       }
-      if (config.get('server.ssl.key') == null || config.get('server.ssl.cert') == null) {
-        throw new Error('HTTPS is required. Please set server.ssl.key and server.ssl.cert in kibana.yml.');
-      }
 
       server.register([hapiAuthCookie, Bell], function (error) {
         server.auth.strategy('session', 'cookie', 'required', {
@@ -50,7 +47,8 @@ module.exports = function (kibana) {
           provider: config.get('oauth2.provider'),
           password: config.get('oauth2.encryptionKey'),
           clientId: config.get('oauth2.providerId'),
-          clientSecret: config.get('oauth2.providerSecret')
+          clientSecret: config.get('oauth2.providerSecret'),
+          isSecure: !!config.get('server.ssl.cert')
         });
       });
 
