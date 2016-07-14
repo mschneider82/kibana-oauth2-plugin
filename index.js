@@ -40,7 +40,8 @@ module.exports = function (kibana) {
             path: config.get('server.basePath') + '/',
             clearInvalid: true,
             keepAlive: true,
-            redirectTo: `${config.get('server.basePath')}/login`
+            redirectTo: `${config.get('server.basePath')}/login`,
+            isSecure: !!config.get('server.ssl.cert')
         });
 
         server.auth.strategy(config.get('oauth2.provider'), 'bell', {
