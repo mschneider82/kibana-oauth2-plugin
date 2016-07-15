@@ -1,6 +1,7 @@
 const hapiAuthCookie = require('hapi-auth-cookie');
 const Boom = require('boom');
 const Bell = require('bell');
+const _ = require('lodash');
 
 const esRequestInterceptor = require('./server/es_request_interceptor');
 
@@ -17,7 +18,12 @@ module.exports = function (kibana) {
         provider: Joi.string(),
         clientId: Joi.string(),
         clientSecret: Joi.string(),
-        allowedIndices: Joi.array().items(Joi.string()).single()
+        allowedIndices: Joi.array().items(Joi.string()).single(),
+        allowedDomains: Joi.alternatives().when('provider', {
+          is: 'google',
+          then: Joi.array().items(Joi.string()),
+          otherwise: Joi.any().forbidden()
+        })
       }).default()
     },
 
@@ -48,7 +54,7 @@ module.exports = function (kibana) {
           provider: config.get('oauth2.provider'),
           password: config.get('oauth2.password'),
           clientId: config.get('oauth2.clientId'),
-          clientSecret: config.get('oauth2.clientSecret')
+          clientSecret: config.get('oauth2.clientSecret'),
           isSecure: !!config.get('server.ssl.cert')
         });
       });
@@ -62,6 +68,13 @@ module.exports = function (kibana) {
         handler: function (request, reply) {
           if (!request.auth.isAuthenticated) {
             return reply(Boom.unauthorized('Authentication failed: ' + request.auth.error.message));
+          }
+
+          var allowedIndices = config.get('oauth2.allowedDomains');
+          if (allowedIndices && allowedIndices.length) {
+            if (allowedIndices.indexOf(_.get(request.auth.credentials, 'profile.raw.domain')) === -1) {
+              return reply(Boom.forbidden('Domain not allowed'));
+            }
           }
 
           request.auth.session.set(request.auth.credentials);
