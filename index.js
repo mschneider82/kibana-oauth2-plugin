@@ -80,7 +80,9 @@ module.exports = function (kibana) {
         }
       });
 
-      esRequestInterceptor(server);
+      if (Array.isArray(config.get('oauth2.allowedIndices'))) {
+        esRequestInterceptor(server);
+      }
     }
   });
 };
