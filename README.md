@@ -18,6 +18,7 @@ oauth2.password
 oauth2.provider
 oauth2.clientId
 oauth2.clientSecret
+oauth2.redirectUri (Optional: used to set redirect_uri on server.auth.strategy.location manually)
 ```
 
 To get the list of supported providers, see [Bell's documentation](https://github.com/hapijs/bell)
