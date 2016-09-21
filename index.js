@@ -17,6 +17,7 @@ module.exports = function (kibana) {
         sessionTimeout: Joi.number().default(30 * 60 * 1000),
         provider: Joi.string(),
         clientId: Joi.string(),
+        redirectUri: Joi.string(),
         clientSecret: Joi.string(),
         allowedIndices: Joi.array().items(Joi.string()).single(),
         allowedDomains: Joi.alternatives().when('provider', {
@@ -55,6 +56,7 @@ module.exports = function (kibana) {
           password: config.get('oauth2.password'),
           clientId: config.get('oauth2.clientId'),
           clientSecret: config.get('oauth2.clientSecret'),
+          location: config.get('oauth2.redirectUri'),          
           isSecure: !!config.get('server.ssl.cert')
         });
       });
