@@ -18,6 +18,7 @@ module.exports = function (kibana) {
         provider: Joi.string(),
         clientId: Joi.string(),
         redirectUri: Joi.string(),
+        forceHttps: Joi.boolean(),
         clientSecret: Joi.string(),
         allowedIndices: Joi.array().items(Joi.string()).single(),
         allowedDomains: Joi.alternatives().when('provider', {
@@ -56,8 +57,9 @@ module.exports = function (kibana) {
           password: config.get('oauth2.password'),
           clientId: config.get('oauth2.clientId'),
           clientSecret: config.get('oauth2.clientSecret'),
-          location: config.get('oauth2.redirectUri'),          
-          isSecure: !!config.get('server.ssl.cert')
+          location: config.get('oauth2.redirectUri'),
+          isSecure: !!config.get('server.ssl.cert'),
+          forceHttps: typeof config.get('oauth2.forceHttps') === 'boolean' ? config.get('oauth2.forceHttps') : undefined
         });
       });
 

@@ -9,16 +9,22 @@ Kibana 4.4+
 2. From the Kibana root directory, install the plugin with the following command:
 
 ```
-bin/kibana plugin -i oauth2 -u https://github.com/appuri/kibana-oauth2-plugin/releases/download/0.2.0/kibana-oauth2-plugin-0.2.0.zip
+bin/kibana plugin -i oauth2 -u https://github.com/appuri/kibana-oauth2-plugin/releases/download/0.3.0/kibana-oauth2-plugin-0.3.0.zip
 ```
 
-3. Set the following config options that map to [Bell `server.auth.strategy` options](https://github.com/hapijs/bell/blob/master/API.md):
+3. Set the following required config options that map to [Bell `server.auth.strategy` options](https://github.com/hapijs/bell/blob/master/API.md):
 ```
 oauth2.password
 oauth2.provider
 oauth2.clientId
 oauth2.clientSecret
-oauth2.redirectUri (Optional: used to set redirect_uri on server.auth.strategy.location manually)
+```
+
+Optional settings are below
+
+```
+oauth2.redirectUri (Used to set `redirect_uri` on `server.auth.strategy.location` manually)
+oauth2.forceHttps (Maps to `server.auth.strategy.forceHttps` to infer the `redirect_uri` but use HTTPS as the scheme)
 ```
 
 To get the list of supported providers, see [Bell's documentation](https://github.com/hapijs/bell)
