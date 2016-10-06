@@ -91,7 +91,7 @@ module.exports = function (kibana) {
           if (config.has('oauth2.allowedOrganizations')) {
             const allowedOrganizations = config.get('oauth2.allowedOrganizations');
             const token = _.get(request.auth.credentials, 'token');
-            axios.get('https://api.github.com/user/orgs', {
+            return axios.get('https://api.github.com/user/orgs', {
               headers: { 'Authorization': 'token ' + token }
             }).then(function(response) {
               const organizations = response.data.map((org) => org.login);
@@ -105,7 +105,6 @@ module.exports = function (kibana) {
             }).catch(function (error) {
               return reply(Boom.unauthorized('Unable to verify the user\'s organizations'));
             });
-            return;
           }
 
           request.auth.session.set(request.auth.credentials);
