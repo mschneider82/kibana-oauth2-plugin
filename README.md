@@ -23,8 +23,9 @@ oauth2.clientSecret
 Optional settings are below
 
 ```
-oauth2.redirectUri (Used to set `redirect_uri` on `server.auth.strategy.location` manually)
-oauth2.forceHttps (Maps to `server.auth.strategy.forceHttps` to infer the `redirect_uri` but use HTTPS as the scheme)
+oauth2.redirectUri - Used to set `redirect_uri` on `server.auth.strategy.location` manually.
+oauth2.forceHttps - Maps to `server.auth.strategy.forceHttps` to infer the `redirect_uri` but use HTTPS as the scheme.
+oauth2.allowedOrganizations - Array containing the organizations whose users are allowed to access Kibana.
 ```
 
 To get the list of supported providers, see [Bell's documentation](https://github.com/hapijs/bell)
