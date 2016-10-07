@@ -2,6 +2,7 @@ const hapiAuthCookie = require('hapi-auth-cookie');
 const Boom = require('boom');
 const Bell = require('bell');
 const _ = require('lodash');
+const axios = require('axios');
 
 const esRequestInterceptor = require('./server/es_request_interceptor');
 
@@ -23,6 +24,11 @@ module.exports = function (kibana) {
         allowedIndices: Joi.array().items(Joi.string()).single(),
         allowedDomains: Joi.alternatives().when('provider', {
           is: 'google',
+          then: Joi.array().items(Joi.string()),
+          otherwise: Joi.any().forbidden()
+        }),
+        allowedOrganizations: Joi.alternatives().when('provider', {
+          is: 'github',
           then: Joi.array().items(Joi.string()),
           otherwise: Joi.any().forbidden()
         })
@@ -59,7 +65,8 @@ module.exports = function (kibana) {
           clientSecret: config.get('oauth2.clientSecret'),
           location: config.get('oauth2.redirectUri'),
           isSecure: !!config.get('server.ssl.cert'),
-          forceHttps: typeof config.get('oauth2.forceHttps') === 'boolean' ? config.get('oauth2.forceHttps') : undefined
+          forceHttps: typeof config.get('oauth2.forceHttps') === 'boolean' ? config.get('oauth2.forceHttps') : undefined,
+          scope: config.get('oauth2.provider') === 'github' && config.has('oauth2.allowedOrganizations') ? ['user:email', 'read:org'] : undefined
         });
       });
 
@@ -79,6 +86,25 @@ module.exports = function (kibana) {
             if (allowedIndices.indexOf(_.get(request.auth.credentials, 'profile.raw.domain')) === -1) {
               return reply(Boom.forbidden('Domain not allowed'));
             }
+          }
+
+          if (config.has('oauth2.allowedOrganizations')) {
+            const allowedOrganizations = config.get('oauth2.allowedOrganizations');
+            const token = _.get(request.auth.credentials, 'token');
+            return axios.get('https://api.github.com/user/orgs', {
+              headers: { 'Authorization': 'token ' + token }
+            }).then(function(response) {
+              const organizations = response.data.map((org) => org.login);
+              for (let organization of organizations) {
+                if (allowedOrganizations.indexOf(organization) !== -1) {
+                  request.auth.session.set(request.auth.credentials);
+                  return reply.redirect('./');
+                }
+              }
+              return reply(Boom.forbidden('None of the user\'s organization is allowed'));
+            }).catch(function (error) {
+              return reply(Boom.unauthorized('Unable to verify the user\'s organizations'));
+            });
           }
 
           request.auth.session.set(request.auth.credentials);
