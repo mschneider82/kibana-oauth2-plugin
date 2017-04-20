@@ -1,6 +1,6 @@
 {
   "name": "kibana-oauth2-plugin",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "OAuth2 plugin for Kibana",
   "main": "index.js",
   "kibana": {
