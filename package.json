@@ -4,10 +4,15 @@
   "description": "OAuth2 plugin for Kibana",
   "main": "index.js",
   "kibana": {
-    "version": "5.3.0"
+    "version": "5.0.0"
   },
   "scripts": {
-    "build": "gulp build"
+    "lint": "eslint",
+    "start": "plugin-helpers start",
+    "test:server": "plugin-helpers test:server",
+    "test:browser": "plugin-helpers test:browser",
+    "build": "plugin-helpers build",
+    "postinstall": "plugin-helpers postinstall"
   },
   "repository": {
     "type": "git",
@@ -24,10 +29,11 @@
     "lodash": "3.10.1"
   },
   "devDependencies": {
-    "gulp": "^3.9.1",
-    "gulp-rename": "^1.2.2",
-    "gulp-zip": "^3.2.0",
-    "path": "^0.12.7",
-    "vinyl-fs": "^2.3.4"
+    "@elastic/eslint-config-kibana": "0.0.2",
+    "@elastic/plugin-helpers": "^6.0.0",
+    "babel-eslint": "4.1.8",
+    "chai": "^3.5.0",
+    "eslint": "1.10.3",
+    "eslint-plugin-mocha": "1.1.0"
   }
 }
