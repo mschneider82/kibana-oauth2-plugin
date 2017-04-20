@@ -1,6 +1,6 @@
 {
   "name": "oauth2",
-  "version": "0.3.0",
+  "version": "1.0.0",
   "description": "OAuth2 plugin for Kibana",
   "scripts": {
     "build": "gulp build"
