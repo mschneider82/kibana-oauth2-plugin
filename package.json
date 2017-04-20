@@ -2,6 +2,10 @@
   "name": "kibana-oauth2-plugin",
   "version": "1.0.1",
   "description": "OAuth2 plugin for Kibana",
+  "main": "index.js",
+  "kibana": {
+      "version": "5.3.0"
+  },
   "scripts": {
     "build": "gulp build"
   },
