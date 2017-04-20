@@ -17,6 +17,9 @@ module.exports = function (kibana) {
         password: Joi.string(),
         sessionTimeout: Joi.number().default(30 * 60 * 1000),
         provider: Joi.string(),
+        providerProtocol: Joi.string(),
+        providerAuth: Joi.string(),
+        providerToken: Joi.string(),
         clientId: Joi.string(),
         redirectUri: Joi.string(),
         forceHttps: Joi.boolean(),
@@ -54,9 +57,9 @@ module.exports = function (kibana) {
 
         server.auth.strategy(config.get('oauth2.provider'), 'bell', {
           provider: {
-              protocol: config.get('oauth2.provider.protocol'),
-              auth: config.get('oauth2.provider.auth'),
-              token: config.get('oauth2.provider.token'),
+              protocol: config.get('oauth2.providerProtocol'),
+              auth: config.get('oauth2.providerAuth'),
+              token: config.get('oauth2.providerToken'),
             //   scope: config.get('oauth2.provider.scope'),
             //   scopeSeparator: config.get('oauth2.provider.scopeSeparator'),
               profile: (credentials, params, get, callback) => {
