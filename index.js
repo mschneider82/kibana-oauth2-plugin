@@ -21,17 +21,7 @@ module.exports = function (kibana) {
         redirectUri: Joi.string(),
         forceHttps: Joi.boolean(),
         clientSecret: Joi.string(),
-        allowedIndices: Joi.array().items(Joi.string()).single(),
-        allowedDomains: Joi.alternatives().when('provider', {
-          is: 'google',
-          then: Joi.array().items(Joi.string()),
-          otherwise: Joi.any().forbidden()
-        }),
-        allowedOrganizations: Joi.alternatives().when('provider', {
-          is: 'github',
-          then: Joi.array().items(Joi.string()),
-          otherwise: Joi.any().forbidden()
-        })
+        allowedIndices: Joi.array().items(Joi.string()).single()
       }).default()
     },
 
@@ -40,13 +30,17 @@ module.exports = function (kibana) {
     },
 
     init: function (server, options) {
+
       const config = server.config();
-      if (config.get('oauth2.password') == null) throw new Error('oauth2.password is required in kibana.yml.');
+      if (config.get('oauth2.password') == null) {
+          throw new Error('oauth2.password is required in kibana.yml.');
+      }
       if (config.get('oauth2.provider') == null || config.get('oauth2.clientId') == null || config.get('oauth2.clientSecret') == null) {
         throw new Error('Please set oauth2.provider, oauth2.clientId, and oauth2.clientSecret in kibana.yml.');
       }
 
       server.register([hapiAuthCookie, Bell], function (error) {
+
         server.auth.strategy('session', 'cookie', 'required', {
             cookie: config.get('oauth2.cookieName'),
             password: config.get('oauth2.password'),
@@ -59,7 +53,18 @@ module.exports = function (kibana) {
         });
 
         server.auth.strategy(config.get('oauth2.provider'), 'bell', {
-          provider: config.get('oauth2.provider'),
+          provider: {
+              protocol: config.get('oauth2.provider.protocol'),
+              auth: config.get('oauth2.provider.auth'),
+              token: config.get('oauth2.provider.token'),
+            //   scope: config.get('oauth2.provider.scope'),
+            //   scopeSeparator: config.get('oauth2.provider.scopeSeparator'),
+              profile: (credentials, params, get, callback) => {
+
+                  console.log('credentials: ', credentials);
+                  callback(null, {});
+              }
+          },
           password: config.get('oauth2.password'),
           clientId: config.get('oauth2.clientId'),
           clientSecret: config.get('oauth2.clientSecret'),
@@ -79,32 +84,6 @@ module.exports = function (kibana) {
         handler: function (request, reply) {
           if (!request.auth.isAuthenticated) {
             return reply(Boom.unauthorized('Authentication failed: ' + request.auth.error.message));
-          }
-
-          var allowedIndices = config.get('oauth2.allowedDomains');
-          if (allowedIndices && allowedIndices.length) {
-            if (allowedIndices.indexOf(_.get(request.auth.credentials, 'profile.raw.domain')) === -1) {
-              return reply(Boom.forbidden('Domain not allowed'));
-            }
-          }
-
-          if (config.has('oauth2.allowedOrganizations')) {
-            const allowedOrganizations = config.get('oauth2.allowedOrganizations');
-            const token = _.get(request.auth.credentials, 'token');
-            return axios.get('https://api.github.com/user/orgs', {
-              headers: { 'Authorization': 'token ' + token }
-            }).then(function(response) {
-              const organizations = response.data.map((org) => org.login);
-              for (let organization of organizations) {
-                if (allowedOrganizations.indexOf(organization) !== -1) {
-                  request.auth.session.set(request.auth.credentials);
-                  return reply.redirect('./');
-                }
-              }
-              return reply(Boom.forbidden('None of the user\'s organization is allowed'));
-            }).catch(function (error) {
-              return reply(Boom.unauthorized('Unable to verify the user\'s organizations'));
-            });
           }
 
           request.auth.session.set(request.auth.credentials);
